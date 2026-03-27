@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 1: Build the Yew/Wasm frontend with Trunk
 # ─────────────────────────────────────────────────────────────────────────────
-FROM rust:1.77-slim AS frontend-builder
+FROM rust:1.85-slim AS frontend-builder
 
 # Install system dependencies needed for Wasm toolchain
 RUN apt-get update && apt-get install -y \
@@ -29,7 +29,7 @@ RUN trunk build --release
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 2: Build the Axum backend (native binary)
 # ─────────────────────────────────────────────────────────────────────────────
-FROM rust:1.77-slim AS backend-builder
+FROM rust:1.85-slim AS backend-builder
 
 RUN apt-get update && apt-get install -y \
     pkg-config \
