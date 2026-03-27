@@ -47,7 +47,7 @@ enum Message {
 struct AppState {
     board: Option<Board>,
     original: Option<Board>,
-    selected: Option<usize>,   // flat index 0-80
+    selected: Option<usize>,
     error_cells: Vec<usize>,
     difficulty: Difficulty,
     loading: bool,
@@ -109,7 +109,6 @@ impl Reducible for AppState {
             }
             Action::SelectCell(idx) => {
                 if let Some(ref board) = state.board {
-                    // Only selectable if not a given.
                     if !board.givens[idx] && !state.game_won {
                         state.selected = Some(idx);
                     }
@@ -160,7 +159,6 @@ impl Reducible for AppState {
                 if let (Some(ref mut board), Some(ref original)) =
                     (&mut state.board, &state.original)
                 {
-                    // Restore all non-given cells to 0.
                     for i in 0..81 {
                         if !original.givens[i] {
                             board.cells[i] = 0;
@@ -182,20 +180,19 @@ impl Reducible for AppState {
 pub fn app() -> Html {
     let state = use_reducer(AppState::default);
 
-    // ── Timer tick every second ──
+    // Timer tick every second
     {
         let state = state.clone();
         use_effect_with((), move |_| {
             let interval = Interval::new(1000, move || {
                 state.dispatch(Action::Tick);
             });
-            // Keep the interval alive for the lifetime of the component.
             Box::leak(Box::new(interval));
             || ()
         });
     }
 
-    // ── Fetch new puzzle ──
+    // Fetch new puzzle
     let fetch_puzzle = {
         let state = state.clone();
         Callback::from(move |difficulty: Difficulty| {
@@ -230,7 +227,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Validate board ──
+    // Validate board
     let validate_board = {
         let state = state.clone();
         Callback::from(move |_: ()| {
@@ -266,7 +263,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Solve board ──
+    // Solve board
     let solve_board = {
         let state = state.clone();
         Callback::from(move |_: ()| {
@@ -304,7 +301,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Cell click ──
+    // Cell click
     let on_cell_click = {
         let state = state.clone();
         Callback::from(move |idx: usize| {
@@ -312,7 +309,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Digit entry (numpad) ──
+    // Digit entry
     let on_digit = {
         let state = state.clone();
         Callback::from(move |digit: u8| {
@@ -320,7 +317,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Difficulty change ──
+    // Difficulty change
     let on_difficulty = {
         let state = state.clone();
         let fetch = fetch_puzzle.clone();
@@ -330,7 +327,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── New game button ──
+    // New game
     let on_new_game = {
         let fetch = fetch_puzzle.clone();
         let difficulty = state.difficulty;
@@ -339,7 +336,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Reset button ──
+    // Reset
     let on_reset = {
         let state = state.clone();
         Callback::from(move |_: MouseEvent| {
@@ -347,7 +344,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Validate button ──
+    // Validate
     let on_validate = {
         let validate = validate_board.clone();
         Callback::from(move |_: MouseEvent| {
@@ -355,7 +352,7 @@ pub fn app() -> Html {
         })
     };
 
-    // ── Solve button ──
+    // Solve
     let on_solve = {
         let solve = solve_board.clone();
         Callback::from(move |_: MouseEvent| {
@@ -370,7 +367,6 @@ pub fn app() -> Html {
                 <p>{"Built with Rust + Yew"}</p>
             </header>
 
-            // ── Controls ──
             <div class="controls">
                 <div class="difficulty-selector">
                     { for [Difficulty::Easy, Difficulty::Medium, Difficulty::Hard].iter().map(|&d| {
@@ -405,7 +401,6 @@ pub fn app() -> Html {
                 </button>
             </div>
 
-            // ── Status bar ──
             <div class="status-bar">
                 if state.board.is_some() {
                     <span class="timer">{ format_time(state.elapsed_secs) }</span>
@@ -420,7 +415,6 @@ pub fn app() -> Html {
                 }
             </div>
 
-            // ── Board or loading ──
             if state.loading {
                 <div class="loading">
                     <div class="spinner"></div>
@@ -518,6 +512,11 @@ struct NumPadProps {
 
 #[function_component(NumPad)]
 fn num_pad(props: &NumPadProps) -> Html {
+    let on_erase = {
+        let cb = props.on_digit.clone();
+        Callback::from(move |_: MouseEvent| cb.emit(0))
+    };
+
     html! {
         <div class="numpad">
             { for (1u8..=9).map(|d| {
@@ -528,14 +527,9 @@ fn num_pad(props: &NumPadProps) -> Html {
                     </button>
                 }
             }) }
-            {
-                let cb = props.on_digit.clone();
-                html! {
-                    <button class="numpad-btn erase" onclick={Callback::from(move |_: MouseEvent| cb.emit(0))}>
-                        {"Erase"}
-                    </button>
-                }
-            }
+            <button class="numpad-btn erase" onclick={on_erase}>
+                {"Erase"}
+            </button>
         </div>
     }
 }
