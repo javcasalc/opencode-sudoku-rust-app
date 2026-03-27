@@ -363,7 +363,7 @@ pub fn app() -> Html {
     html! {
         <div>
             <header>
-                <h1>{"Sudoku"}</h1>
+                <h1>{"JCA's Sudoku"}</h1>
                 <p>{"Built with Rust + Yew"}</p>
             </header>
 
