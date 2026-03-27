@@ -123,7 +123,9 @@ async fn post_solve(Json(body): Json<SolveRequest>) -> impl IntoResponse {
     let mut board = body.board.clone();
     let solved = sudoku_core::solve(&mut board);
     let result_board = if solved { Some(board) } else { None };
-    Json(SolveResponse { board: result_board })
+    Json(SolveResponse {
+        board: result_board,
+    })
 }
 
 // ─── Static file handler ─────────────────────────────────────────────────────
@@ -140,11 +142,7 @@ async fn static_handler(uri: Uri) -> Response {
         Some(f) => {
             let mime = from_path(f.path()).first_or_octet_stream();
             let content_type = mime.as_ref().to_string();
-            (
-                [(header::CONTENT_TYPE, content_type)],
-                f.contents(),
-            )
-                .into_response()
+            ([(header::CONTENT_TYPE, content_type)], f.contents()).into_response()
         }
         None => (StatusCode::NOT_FOUND, "Not found").into_response(),
     }

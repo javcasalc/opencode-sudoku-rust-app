@@ -1,8 +1,8 @@
 //! sudoku-core: board representation, puzzle generation, solving, and validation.
 
+use rand::rngs::SmallRng;
 use rand::seq::SliceRandom;
 use rand::SeedableRng;
-use rand::rngs::SmallRng;
 use serde::{Deserialize, Serialize};
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -228,9 +228,8 @@ pub fn validate(board: &Board) -> ValidationResult {
     }
     for box_row in 0..3 {
         for box_col in 0..3 {
-            let indices = (0..3).flat_map(|r| {
-                (0..3).map(move |c| (box_row * 3 + r) * 9 + (box_col * 3 + c))
-            });
+            let indices =
+                (0..3).flat_map(|r| (0..3).map(move |c| (box_row * 3 + r) * 9 + (box_col * 3 + c)));
             check_group(board, indices, &mut error_set);
         }
     }
@@ -313,7 +312,10 @@ mod tests {
             2,8,7, 4,1,9, 6,3,5,
             3,4,5, 2,8,6, 1,7,9,
         ];
-        Board { cells, givens: vec![true; 81] }
+        Board {
+            cells,
+            givens: vec![true; 81],
+        }
     }
 
     #[test]
