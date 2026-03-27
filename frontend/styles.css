@@ -1,0 +1,266 @@
+/* ─── Global Reset & Variables ─────────────────────────────────────────────── */
+:root {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --surface2: #0f3460;
+  --accent: #e94560;
+  --accent2: #533483;
+  --text: #eaeaea;
+  --text-muted: #8892a4;
+  --given: #c9d1d9;
+  --user: #58a6ff;
+  --error: #ff6b6b;
+  --selected: #1f4068;
+  --selected-group: #162447;
+  --border-thin: 1px solid #2a2a4a;
+  --border-thick: 3px solid #e94560;
+  --cell-size: 56px;
+  --gap: 2px;
+  --box-gap: 6px;
+  --radius: 8px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 48px;
+}
+
+/* ─── Header ────────────────────────────────────────────────────────────────── */
+header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+header h1 {
+  font-size: 2.4rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+header p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+/* ─── Controls bar ──────────────────────────────────────────────────────────── */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.btn {
+  padding: 9px 20px;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 0.88rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.btn-primary   { background: var(--accent);  color: #fff; }
+.btn-secondary { background: var(--surface2); color: var(--text); }
+.btn-success   { background: #238636; color: #fff; }
+.btn-warning   { background: #9e6a03; color: #fff; }
+
+.difficulty-selector {
+  display: flex;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: var(--border-thin);
+}
+.diff-btn {
+  padding: 9px 16px;
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.diff-btn.active {
+  background: var(--accent2);
+  color: var(--text);
+}
+
+/* ─── Timer & Status ────────────────────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+.timer {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+.message {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+.message.success  { background: #1a3a1a; color: #3fb950; }
+.message.error    { background: #3a1a1a; color: #ff6b6b; }
+.message.info     { background: #1a2a3a; color: #58a6ff; }
+
+/* ─── Board ─────────────────────────────────────────────────────────────────── */
+.board-wrapper {
+  padding: 20px;
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: var(--border-thin);
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(9, var(--cell-size));
+  gap: 0;
+}
+
+/* Thick borders every 3 cells using box-shadow on individual cells */
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  border: 1px solid #2a2a4a;
+  transition: background 0.1s;
+  outline: none;
+}
+
+/* Thick right border after columns 2, 5 (0-indexed) */
+.cell[data-col="2"],
+.cell[data-col="5"] {
+  border-right: 3px solid var(--accent);
+}
+/* Thick bottom border after rows 2, 5 */
+.cell[data-row="2"],
+.cell[data-row="5"] {
+  border-bottom: 3px solid var(--accent);
+}
+/* Outer borders */
+.cell[data-col="0"] { border-left: 3px solid var(--accent); }
+.cell[data-col="8"] { border-right: 3px solid var(--accent); }
+.cell[data-row="0"] { border-top: 3px solid var(--accent); }
+.cell[data-row="8"] { border-bottom: 3px solid var(--accent); }
+
+.cell.given {
+  color: var(--given);
+  background: var(--surface);
+  cursor: default;
+}
+.cell.user-input {
+  color: var(--user);
+  background: var(--surface);
+}
+.cell.empty {
+  color: transparent;
+  background: var(--surface);
+}
+.cell.selected {
+  background: var(--selected) !important;
+}
+.cell.highlighted {
+  background: var(--selected-group);
+}
+.cell.error {
+  color: var(--error) !important;
+  background: rgba(255, 107, 107, 0.12) !important;
+}
+
+.cell input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  text-align: center;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--user);
+  cursor: pointer;
+  caret-color: transparent;
+}
+
+/* ─── Number Pad ────────────────────────────────────────────────────────────── */
+.numpad {
+  display: grid;
+  grid-template-columns: repeat(5, 52px);
+  gap: 8px;
+  margin-top: 20px;
+}
+.numpad-btn {
+  height: 52px;
+  background: var(--surface2);
+  color: var(--text);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1.25rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.1s, transform 0.1s;
+}
+.numpad-btn:hover  { background: var(--accent2); }
+.numpad-btn:active { transform: scale(0.93); }
+.numpad-btn.erase  { font-size: 1rem; background: #3a1a1a; color: #ff6b6b; }
+
+/* ─── Loading overlay ───────────────────────────────────────────────────────── */
+.loading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 1rem;
+  margin-top: 60px;
+}
+.spinner {
+  width: 24px; height: 24px;
+  border: 3px solid var(--surface2);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  :root { --cell-size: 38px; }
+  header h1 { font-size: 1.8rem; }
+  .numpad { grid-template-columns: repeat(5, 40px); gap: 6px; }
+  .numpad-btn { height: 40px; font-size: 1rem; }
+  .cell { font-size: 1rem; }
+  .cell input { font-size: 1rem; }
+}

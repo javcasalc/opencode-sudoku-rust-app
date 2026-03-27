@@ -1,0 +1,6 @@
+target/
+frontend/dist/
+.git/
+.github/
+*.md
+scripts/
