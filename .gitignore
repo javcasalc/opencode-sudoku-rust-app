@@ -1,10 +1,9 @@
 /target/
 frontend/target/
-# Only ignore the real Wasm build outputs inside dist, not the stub index.html
+# Only ignore Wasm/JS build artefacts inside dist, not the stub index.html
 frontend/dist/*.wasm
 frontend/dist/*.js
 frontend/dist/*.ts
 **/*.rs.bk
-Cargo.lock
 .DS_Store
 .env

@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       - name: Install Rust stable toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -33,7 +33,7 @@ jobs:
           components: clippy, rustfmt
 
       - name: Cache Cargo registry and build artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@v4.2.3
         with:
           path: |
             ~/.cargo/registry
@@ -70,19 +70,19 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4.2.2
 
       # ── Authenticate to GCP via Workload Identity Federation ──
       - name: Authenticate to Google Cloud
         id: auth
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@v2.1.8
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
 
       # ── Set up gcloud CLI ──
       - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+        uses: google-github-actions/setup-gcloud@v2.1.4
         with:
           project_id: ${{ env.PROJECT_ID }}
 
@@ -92,11 +92,11 @@ jobs:
 
       # ── Set up Docker Buildx for efficient layer caching ──
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3.10.0
 
       # ── Build and push Docker image ──
       - name: Build and push Docker image
-        uses: docker/build-push-action@v5
+        uses: docker/build-push-action@v6.15.0
         with:
           context: .
           push: true
